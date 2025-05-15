@@ -1,0 +1,190 @@
+# 证券量化交易监控平台 Cursor规则文件
+
+# 文件和目录规范
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+[*.{json,yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# 项目结构规范
+project_structure:
+  required_dirs:
+    - config        # 配置文件目录
+    - data          # 数据处理模块
+    - strategies    # 策略模块
+    - risk          # 风控模块
+    - utils         # 工具函数
+    - tests         # 测试文件目录
+    - docs          # 文档目录
+
+# Python编码规则
+python:
+  # PEP 8编码规范
+  pep8: true
+  
+  # 代码复杂度限制
+  max_complexity: 12
+  
+  # 函数和类规则
+  class_naming: PascalCase       # 类名使用驼峰命名法
+  function_naming: snake_case    # 函数使用下划线命名法
+  constant_naming: UPPER_CASE    # 常量使用全大写
+  
+  # 文件头部必需注释
+  required_header:
+    - "# -*- coding: utf-8 -*-"
+    - "# 功能描述: {description}"
+    - "# 作者: {author}"
+    - "# 创建日期: {date}"
+    - "# 版本: {version}"
+  
+  # 文档字符串规范
+  docstring:
+    required: true
+    style: google               # 使用Google风格的文档字符串
+    
+  # 导入规则
+  imports:
+    order:
+      - standard_library        # 标准库导入
+      - third_party             # 第三方库导入
+      - qmt_specific            # QMT相关导入
+      - local                   # 本地模块导入
+    qmt_modules:                # QMT模块列表，用于识别QMT相关导入
+      - XtQuant
+      - XtData
+      - Xttrade
+    banned_imports:             # 禁止使用的导入
+      - "from __future__ import annotations"
+      - "import *"
+  
+  # 错误处理规范  
+  error_handling:
+    required: true              # 必须进行异常处理
+    log_exceptions: true        # 异常必须记录到日志
+    specific_exceptions: true   # 使用具体的异常类型
+
+# QMT API调用规范
+qmt_api:
+  # API版本检查
+  version_check: true
+  
+  # 行情模块调用规范
+  xtdata:
+    connection_check: true      # 调用前必须检查连接状态
+    validate_instruments: true  # 必须验证合约有效性
+    async_processing: true      # 使用异步处理模式
+  
+  # 交易模块调用规范
+  xttrade:
+    login_check: true           # 交易前必须验证登录状态
+    log_operations: true        # 必须记录所有交易操作
+    queue_management: true      # 实现交易指令队列管理
+  
+  # 回调处理规范
+  callbacks:
+    handle_all_cases: true      # 必须处理所有可能的数据类型和状态
+    status_tracking: true       # 必须跟踪订单和连接状态
+
+# 日志规范
+logging:
+  required: true
+  levels:
+    - ERROR                     # 影响系统运行的错误
+    - WARNING                   # 不影响运行但需关注的警告
+    - INFO                      # 关键操作信息
+    - DEBUG                     # 调试信息
+  
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  
+  required_log_events:
+    - quote_subscription        # 行情订阅操作
+    - quote_unsubscription      # 行情取消订阅
+    - order_operations          # 交易操作
+    - account_status            # 账户状态变更
+    - exceptions                # 系统异常
+    - performance_metrics       # 性能监控
+
+# 测试规范
+testing:
+  required: true
+  coverage_threshold: 85        # 单元测试覆盖率要求
+  test_scenarios:
+    - normal                    # 正常场景
+    - exception                 # 异常场景
+    - performance               # 性能场景
+  
+  mock_qmt_environment: true    # 模拟QMT环境进行离线测试
+
+# 安全规范
+security:
+  # 敏感信息处理
+  sensitive_info:
+    no_hardcoding: true         # 不允许硬编码敏感信息
+    encryption_required: true   # 敏感信息必须加密存储
+  
+  # 账户安全
+  account_security:
+    multi_factor: true          # 实现多重验证机制
+    credential_handling: secure # 凭证安全处理
+  
+  # 交易安全
+  trading_security:
+    limit_control: true         # 实现交易限额控制
+    anomaly_detection: true     # 异常交易监控
+    confirmation: true          # 关键操作需确认机制
+
+# 性能规范
+performance:
+  # 实时处理性能要求
+  realtime:
+    quote_processing: "10ms"    # 行情处理延迟限制
+    order_execution: "100ms"    # 订单执行延迟限制
+  
+  # 数据处理性能
+  data_processing:
+    batch_size: 1000            # 批处理大小建议
+    parallel_processing: true   # 允许并行处理
+
+# 代码评审规范
+code_review:
+  required: true
+  focus_areas:
+    - qmt_api_usage             # QMT API使用正确性
+    - error_handling            # 错误处理
+    - performance               # 性能考量
+    - security                  # 安全考量
+
+# 文档规范
+documentation:
+  api_docs:
+    required: true
+    format: markdown
+  
+  user_docs:
+    required: true
+    format: markdown
+  
+  code_comments:
+    min_ratio: 0.2              # 注释与代码比例要求
+
+# 持续集成
+ci:
+  required_checks:
+    - lint                      # 代码风格检查
+    - test                      # 单元测试
+    - security                  # 安全检查
+    - performance               # 性能检查 
